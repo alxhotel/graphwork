@@ -6,6 +6,9 @@ import java.util.Map;
 
 public class Finder {
 
+	public static final int TYPE_MOST_CONNECTED = 1;
+	public static final int TYPE_RANDOM = 2;
+	
 	// Original graoh
 	private final Graph graph;
 	
@@ -17,14 +20,29 @@ public class Finder {
 	}
 
 	public Graph getMinimumCoverTree() {
+		// By default
+		return getMinimumCoverTree(TYPE_MOST_CONNECTED);
+	}
+	
+	public Graph getMinimumCoverTree(int type) {
 		this.newGraph = new Graph();
 		
 		while (!isFinished()) {
-			// 1) Get most connected unknwon node, based on my current "newGraph" + path
-			Map.Entry<Vertex, Graph> nodeAndPath = searchMostConnectedNode();
-			
-			// 2) Get a random unknown node, based on my current "newGraph" + path
-			//Map.Entry<Vertex, Graph> nodeAndPath = searchRandomNode();
+			Map.Entry<Vertex, Graph> nodeAndPath;
+			switch (type) {
+				case TYPE_MOST_CONNECTED:
+					// 1) Get most connected unknwon node, based on my current "newGraph" + path
+					nodeAndPath = searchMostConnectedNode();
+					break;
+				case TYPE_RANDOM:
+					// 2) Get a random unknown node, based on my current "newGraph" + path
+					nodeAndPath = searchRandomNode();
+					break;
+				default:
+					// 1) Get most connected unknwon node, based on my current "newGraph" + path
+					nodeAndPath = searchMostConnectedNode();
+					break;
+			}
 			
 			// Add new path to graph
 			if (nodeAndPath.getValue().getSizeOfAdjList() == 0) {

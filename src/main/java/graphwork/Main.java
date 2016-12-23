@@ -1,51 +1,37 @@
 package graphwork;
 
-import java.io.IOException;
-
 public class Main {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		System.out.println("Importing graph...");
 		
-		// Insert manually a graph file here
-		//Graph graph = createGraph("./dtp_large/dtp_100_150_0.txt");
-		Graph graph = Reader.createGraph("./dtp_small/dtp_10_15_0.txt");
-		
+		// Insert a graph file here
+		Graph graph;
+		try {
+			//graph = createGraph("./dtp_large/dtp_100_150_0.txt");
+			graph = Reader.createGraph("./dtp_small/dtp_10_15_0.txt");
+		} catch (Exception ex) {
+			System.out.println("Bad graph file");
+			return;
+		}
 		
 		System.out.println("Num. vertices of the original graph: " + graph.getSizeOfAdjList());
 		System.out.println("--------------------");
 		
 		// Execute algorithm
 		Finder finder = new Finder(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph resultRandom = finder.getMinimumCoverTree(Finder.TYPE_RANDOM);
+		Graph resultMostConnected = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED);
 		
-		// Validate result
-		System.out.println("Validating result...");
-		if (result.isTree()) {
-			System.out.println("Result is a tree");
-		} else {
-			System.out.println("Result is not a tree");
-		}
-		
-		if (result.isVertexCoverOf(graph)) {
-			System.out.println("Result is a vertex cover");
-		} else {
-			System.out.println("Result is not a vertex cover");
-		}
+		// Show result by most connected
+		System.out.println("Num. vertices of the tree cover (by most connected): " + resultMostConnected.getSizeOfAdjList());
+		System.out.println("Total weight of the tree cover (by most connected): " + resultMostConnected.getTotalWeight());
 		
 		System.out.println("--------------------");
 		
-		// Show result
-		System.out.println("Num. vertices of the tree cover: " + result.getSizeOfAdjList());
-		System.out.println("Total weight of the tree cover: " + result.getTotalWeight());
-		
-		System.out.println("--------------------");
-		
-		// Show vertices of the tree cover
-		System.out.println("Vertices of the tree cover:");
-		for (Vertex vertexAux : result.getAllVertices()) {
-			System.out.println(vertexAux);	
-		}
+		// Show result by random
+		System.out.println("Num. vertices of the tree cover (by random): " + resultRandom.getSizeOfAdjList());
+		System.out.println("Total weight of the tree cover (by random): " + resultRandom.getTotalWeight());
 	}
 	
 }
