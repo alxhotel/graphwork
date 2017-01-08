@@ -12,7 +12,7 @@ public class CSV {
 
 	private static final String FILE_HEADER = ""
 			+ "Graph Name,"
-			+ "Weigh Algorithm,Time of algorithm (ms),"
+			+ "Weigh of Most Connected,Time of Most Connected (ms),"
 			+ "Weigh of Random,Time of Random (ms)";
 	
 	public static void createResultsFile(String filePath) {
