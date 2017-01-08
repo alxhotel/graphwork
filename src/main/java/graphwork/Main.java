@@ -1,37 +1,71 @@
 package graphwork;
 
+import java.io.File;
+
 public class Main {
 
+	public static final String RESULTS_CSV_FILEPATH = "./results.csv";
+	
 	public static void main(String[] args) {
-		System.out.println("Importing graph...");
+		System.out.println("Calculating tree cover of all graphs...");
 		
-		// Insert a graph file here
+		// Create results file
+		CSV.createResultsFile(RESULTS_CSV_FILEPATH);
+		
+		// Set of small graphs
+		final File folder = new File("./dtp_small");
+		for (final File fileEntry : folder.listFiles()) {
+			// Exclude bad files
+			if (!fileEntry.isDirectory()) {
+				calculateGraphResult(fileEntry);
+			}
+		}
+		
+		// Set of large graphs
+		final File folderLarge = new File("./dtp_large");
+		for (final File fileEntry : folderLarge.listFiles()) {
+			// Exclude bad files
+			if (!fileEntry.isDirectory()
+				&& !fileEntry.getName().equals("dtp_300_1000_0.txt")
+				&& !fileEntry.getName().equals("dtp_300_1000_1.txt")
+				&& !fileEntry.getName().equals("dtp_300_1000_2.txt")) {
+				
+				calculateGraphResult(fileEntry);
+				
+			}
+		}
+	}
+	
+	private static void calculateGraphResult(File file) {
+		System.out.println("Calculating graph: " + file.getName());
+		
 		Graph graph;
 		try {
-			//graph = createGraph("./dtp_large/dtp_100_150_0.txt");
-			graph = Reader.createGraph("./dtp_small/dtp_10_15_0.txt");
+			graph = Reader.createGraph(file.getAbsolutePath());
 		} catch (Exception ex) {
 			System.out.println("Bad graph file");
 			return;
 		}
 		
-		System.out.println("Num. vertices of the original graph: " + graph.getSizeOfAdjList());
-		System.out.println("--------------------");
-		
 		// Execute algorithm
 		Finder finder = new Finder(graph);
-		Graph resultRandom = finder.getMinimumCoverTree(Finder.TYPE_RANDOM);
+		
+		// Most connected
+		long startTimeAlg = System.currentTimeMillis();
 		Graph resultMostConnected = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED);
+		long totalTimeAlg = System.currentTimeMillis() - startTimeAlg;
+		float weighAlg = resultMostConnected.getTotalWeight();
 		
-		// Show result by most connected
-		System.out.println("Num. vertices of the tree cover (by most connected): " + resultMostConnected.getSizeOfAdjList());
-		System.out.println("Total weight of the tree cover (by most connected): " + resultMostConnected.getTotalWeight());
+		// Random
+		long startTimeRandom = System.currentTimeMillis();
+		Graph resultRandom = finder.getMinimumCoverTree(Finder.TYPE_RANDOM);
+		long totalTimeRandom = System.currentTimeMillis() - startTimeRandom;
+		float weighRandom = resultRandom.getTotalWeight();
 		
-		System.out.println("--------------------");
-		
-		// Show result by random
-		System.out.println("Num. vertices of the tree cover (by random): " + resultRandom.getSizeOfAdjList());
-		System.out.println("Total weight of the tree cover (by random): " + resultRandom.getTotalWeight());
+		// Save to CSV
+		CSV.saveResults(RESULTS_CSV_FILEPATH, file.getName(),
+			weighAlg, totalTimeAlg,
+			weighRandom, totalTimeRandom);
 	}
 	
 }
