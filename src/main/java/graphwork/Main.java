@@ -22,7 +22,7 @@ public class Main {
 		}
 		
 		// Set of large graphs
-		final File folderLarge = new File("./dtp_large");
+		/*final File folderLarge = new File("./dtp_large");
 		for (final File fileEntry : folderLarge.listFiles()) {
 			// Exclude bad files
 			if (!fileEntry.isDirectory()
@@ -33,7 +33,7 @@ public class Main {
 				calculateGraphResult(fileEntry);
 				
 			}
-		}
+		}*/
 	}
 	
 	private static void calculateGraphResult(File file) {
@@ -50,22 +50,35 @@ public class Main {
 		// Execute algorithm
 		Finder finder = new Finder(graph);
 		
-		// Most connected
+		// Most connected - Constructive
 		long startTimeAlg = System.currentTimeMillis();
-		Graph resultMostConnected = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED);
+		Graph resultMostConnected = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED_CONSTRUCTIVE);
 		long totalTimeAlg = System.currentTimeMillis() - startTimeAlg;
 		float weighAlg = resultMostConnected.getTotalWeight();
 		
+		System.out.println("Constructivo Original: " + graph.getTotalWeight());
+		System.out.println("Constructivo New: " + weighAlg);
+		
+		// Least connected - Destructivo
+		long startTimeAlgDestructive = System.currentTimeMillis();
+		Graph resultLeastConnectedDestructive = finder.getMinimumCoverTree(Finder.TYPE_LEAST_CONNECTED_DESTRUCTIVE);
+		long totalTimeAlgDestructive = System.currentTimeMillis() - startTimeAlgDestructive;
+		float weighAlgDestructive = resultLeastConnectedDestructive.getTotalWeight();
+		
+		System.out.println("Destructivo Original: " + graph.getTotalWeight());
+		System.out.println("Destructivo New: " + weighAlgDestructive);
+		
 		// Random
-		long startTimeRandom = System.currentTimeMillis();
+		/*long startTimeRandom = System.currentTimeMillis();
 		Graph resultRandom = finder.getMinimumCoverTree(Finder.TYPE_RANDOM);
 		long totalTimeRandom = System.currentTimeMillis() - startTimeRandom;
-		float weighRandom = resultRandom.getTotalWeight();
+		float weighRandom = resultRandom.getTotalWeight();*/
 		
 		// Save to CSV
-		CSV.saveResults(RESULTS_CSV_FILEPATH, file.getName(),
+		CSV.saveResults(RESULTS_CSV_FILEPATH,
+			file.getName(), graph.getTotalWeight(),
 			weighAlg, totalTimeAlg,
-			weighRandom, totalTimeRandom);
+			weighAlgDestructive, totalTimeAlgDestructive);
 	}
 	
 }

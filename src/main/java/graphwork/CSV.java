@@ -12,8 +12,9 @@ public class CSV {
 
 	private static final String FILE_HEADER = ""
 			+ "Graph Name,"
+			+ "Weigh of Original Graph,"
 			+ "Weigh of Most Connected,Time of Most Connected (ms),"
-			+ "Weigh of Random,Time of Random (ms)";
+			+ "Weigh of Least Connected,Time of Least Connected (ms)";
 	
 	public static void createResultsFile(String filePath) {
 		PrintWriter writer;
@@ -47,9 +48,10 @@ public class CSV {
         }
 	}
 	
-	public static void saveResults(String filePath, String name,
-			Float weigh_alg, Long time_alg,
-			Float weigh_random, Long time_random) {
+	public static void saveResults(String filePath,
+			String name, Float weight_original,
+			Float weight_alg, Long time_alg,
+			Float weight_least, Long time_least) {
 		
 		FileWriter fileWriter = null;
         try {
@@ -58,17 +60,19 @@ public class CSV {
 			// Graph name identifier
 			fileWriter.append(name);
 			fileWriter.append(COMMA_DELIMITER);
+			fileWriter.append(weight_original.toString());
+			fileWriter.append(COMMA_DELIMITER);
 			
 			// Alg
-			fileWriter.append(weigh_alg.toString());
+			fileWriter.append(weight_alg.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			fileWriter.append(time_alg.toString());
 			fileWriter.append(COMMA_DELIMITER);
 
 			// Random
-			fileWriter.append(weigh_random.toString());
+			fileWriter.append(weight_least.toString());
 			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(time_random.toString());
+			fileWriter.append(time_least.toString());
 			
 			// New line
 			fileWriter.append(NEW_LINE_SEPARATOR);

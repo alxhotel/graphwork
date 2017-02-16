@@ -43,7 +43,7 @@ public class AllGraphsTest {
 		assertTrue(graph != null);
 		
 		Finder finder = new Finder(graph);
-		Graph result = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED);
+		Graph result = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED_CONSTRUCTIVE);
 		
 		// Validate result
 		assertTrue(result.isTree());
