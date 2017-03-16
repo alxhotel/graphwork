@@ -1,6 +1,7 @@
 package graphwork;
 
 import java.io.File;
+import java.io.IOException;
 
 public class Main {
 
@@ -42,43 +43,54 @@ public class Main {
 		Graph graph;
 		try {
 			graph = Reader.createGraph(file.getAbsolutePath());
-		} catch (Exception ex) {
+		} catch (IOException ignored) {
 			System.out.println("Bad graph file");
 			return;
 		}
 		
-		// Execute algorithm
-		Finder finder = new Finder(graph);
-		
 		// Most connected - Constructive
-		long startTimeAlg = System.currentTimeMillis();
-		Graph resultMostConnected = finder.getMinimumCoverTree(Finder.TYPE_MOST_CONNECTED_CONSTRUCTIVE);
-		long totalTimeAlg = System.currentTimeMillis() - startTimeAlg;
-		float weighAlg = resultMostConnected.getTotalWeight();
+		FinderConstructive finderConstructive = new FinderConstructive(graph);
+		long startTimeAlgConstructive = System.currentTimeMillis();
+		Graph resultMostConnected = finderConstructive.getMinimumCoverTree();
+		long totalTimeAlgConstructive = System.currentTimeMillis() - startTimeAlgConstructive;
+		float weighAlgConstructive = resultMostConnected.getTotalWeight();
 		
-		System.out.println("Constructivo Original: " + graph.getTotalWeight());
-		System.out.println("Constructivo New: " + weighAlg);
+		System.out.println("\tConstructivo Original: " + graph.getTotalWeight());
+		System.out.println("\tConstructivo New: " + weighAlgConstructive);
 		
-		// Least connected - Destructivo
+		// Least connected - Destructive
+		FinderDestructive finderDestructive = new FinderDestructive(graph);
 		long startTimeAlgDestructive = System.currentTimeMillis();
-		Graph resultLeastConnectedDestructive = finder.getMinimumCoverTree(Finder.TYPE_LEAST_CONNECTED_DESTRUCTIVE);
+		Graph resultLeastConnectedDestructive = finderDestructive.getMinimumCoverTree();
 		long totalTimeAlgDestructive = System.currentTimeMillis() - startTimeAlgDestructive;
 		float weighAlgDestructive = resultLeastConnectedDestructive.getTotalWeight();
 		
-		System.out.println("Destructivo Original: " + graph.getTotalWeight());
-		System.out.println("Destructivo New: " + weighAlgDestructive);
+		System.out.println("\tDestructivo Original: " + graph.getTotalWeight());
+		System.out.println("\tDestructivo New: " + weighAlgDestructive);
+		
+		// Least connected - Destructive Improved
+		FinderDestructiveImproved finderDestructiveImproved = new FinderDestructiveImproved(graph);
+		long startTimeAlgDestructiveImproved = System.currentTimeMillis();
+		Graph resultLeastConnectedDestructiveImproved = finderDestructiveImproved.getMinimumCoverTree();
+		long totalTimeAlgDestructiveImproved = System.currentTimeMillis() - startTimeAlgDestructiveImproved;
+		float weighAlgDestructiveImproved = resultLeastConnectedDestructiveImproved.getTotalWeight();
+		
+		System.out.println("\tDestructivo Mejorado Original: " + graph.getTotalWeight());
+		System.out.println("\tDestructivo Mejorado New: " + weighAlgDestructiveImproved);
 		
 		// Random
-		/*long startTimeRandom = System.currentTimeMillis();
+		/*FinderRandom finderRandom = new FinderRandom(graph);
+		long startTimeRandom = System.currentTimeMillis();
 		Graph resultRandom = finder.getMinimumCoverTree(Finder.TYPE_RANDOM);
 		long totalTimeRandom = System.currentTimeMillis() - startTimeRandom;
 		float weighRandom = resultRandom.getTotalWeight();*/
 		
 		// Save to CSV
-		CSV.saveResults(RESULTS_CSV_FILEPATH,
+		CSV.appendResult(RESULTS_CSV_FILEPATH,
 			file.getName(), graph.getTotalWeight(),
-			weighAlg, totalTimeAlg,
-			weighAlgDestructive, totalTimeAlgDestructive);
+			weighAlgConstructive, totalTimeAlgConstructive,
+			weighAlgDestructive, totalTimeAlgDestructive,
+			weighAlgDestructiveImproved, totalTimeAlgDestructiveImproved);
 	}
 	
 }

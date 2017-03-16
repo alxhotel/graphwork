@@ -14,7 +14,8 @@ public class CSV {
 			+ "Graph Name,"
 			+ "Weigh of Original Graph,"
 			+ "Weigh of Most Connected,Time of Most Connected (ms),"
-			+ "Weigh of Least Connected,Time of Least Connected (ms)";
+			+ "Weigh of Least Connected,Time of Least Connected (ms),"
+			+ "Weigh of Least Connected Improved,Time of Least Connected Improved (ms)";
 	
 	public static void createResultsFile(String filePath) {
 		PrintWriter writer;
@@ -48,10 +49,11 @@ public class CSV {
         }
 	}
 	
-	public static void saveResults(String filePath,
+	public static void appendResult(String filePath,
 			String name, Float weight_original,
 			Float weight_alg, Long time_alg,
-			Float weight_least, Long time_least) {
+			Float weight_least, Long time_least,
+			Float weight_least_improved, Long time_least_improved) {
 		
 		FileWriter fileWriter = null;
         try {
@@ -63,22 +65,27 @@ public class CSV {
 			fileWriter.append(weight_original.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			
-			// Alg
+			// Most connected
 			fileWriter.append(weight_alg.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			fileWriter.append(time_alg.toString());
 			fileWriter.append(COMMA_DELIMITER);
 
-			// Random
+			// Least connected
 			fileWriter.append(weight_least.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			fileWriter.append(time_least.toString());
+			
+			// Least connected improved
+			fileWriter.append(weight_least_improved.toString());
+			fileWriter.append(COMMA_DELIMITER);
+			fileWriter.append(time_least_improved.toString());
 			
 			// New line
 			fileWriter.append(NEW_LINE_SEPARATOR);
 			
             System.out.println("Graph appended to CSV file");
-        } catch (Exception e) {
+        } catch (IOException ignored) {
             System.out.println("Error while creating CSV file");
         } finally {
             try {
@@ -86,7 +93,7 @@ public class CSV {
 					fileWriter.flush();
 					fileWriter.close();
 				}
-            } catch (IOException e) {
+            } catch (IOException ignored) {
                 System.out.println("Error while flushing and closing");
             }
         }

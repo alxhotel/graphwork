@@ -37,13 +37,6 @@ public class Graph {
 		}
 	}
 	
-	public Graph(int numberVertices) {
-		adjList = new HashMap<>();
-		for (int i = 0; i < numberVertices; i++) {
-			adjList.put(new Vertex(i), new ArrayList<>());
-		}
-	}
-	
 	public void addVertex(Vertex newVertex) {
 		adjList.put(newVertex, new ArrayList<>());
 	}
@@ -140,6 +133,7 @@ public class Graph {
 		return this.adjList.containsKey(key);
 	}
 	
+	@Override
 	public String toString() {
 		StringBuilder str = new StringBuilder("");
 		
@@ -147,13 +141,13 @@ public class Graph {
 		while (it.hasNext()) {
 			Map.Entry<Vertex, List<Edge>> entry = it.next();
 			
-			str.append(entry.getKey() + " ==> ");
+			str.append(entry.getKey()).append(" ==> ");
 			
 			Iterator<Edge> it2 = entry.getValue().iterator();
 			while (it2.hasNext()) {
 				Edge entryAux = it2.next();
 				
-				str.append("[" + entryAux.getDestination() + "," + entryAux.getWeight() + "], ");
+				str.append("[").append(entryAux.getDestination()).append(",").append(entryAux.getWeight()).append("], ");
 			}
 			str.append("\n");
 		}
@@ -300,8 +294,8 @@ public class Graph {
 	 * @return 
 	 */
 	public Map.Entry<Vertex, Graph> getLeastConnectedKnownNeighborNode(Graph knownGraph) {
-		Vertex resultingVertex = null;
-		Graph resultingGraph = null;
+		Vertex resultingVertex;
+		Graph resultingGraph;
 		
 		if (knownGraph.isEmpty()) {
 			resultingVertex = null;
@@ -476,6 +470,10 @@ public class Graph {
 		return weightTotal;
 	}
 	
+	/**
+	 * Get if graph is connected
+	 * @return boolean
+	 */
 	public boolean isConnected() {
 		Map<Vertex, Boolean> visitedMap = new HashMap<>();
 		for (Map.Entry<Vertex, List<Edge>> entry : adjList.entrySet()) {
@@ -552,6 +550,128 @@ public class Graph {
 			}
 		}
 	}
-	
+ 
+    /**
+	 * The function to do DFS traversal. It uses recursive function APUtil()
+	 * 
+	 * Complexity: O(V+E)
+	 * @return articulation points (vertices)
+	 */	
+	public List<Vertex> getArticulationPoints() {
+		// Mark all the vertices as not visited
+		Map<Vertex, Boolean> visited = new HashMap<>();
+		Map<Vertex, Integer> disc = new HashMap<>();
+		Map<Vertex, Integer> low = new HashMap<>();
+		Map<Vertex, Vertex> parent = new HashMap<>();
+		Map<Vertex, Boolean> ap = new HashMap<>();
+ 
+		// Initialize arrays
+		List<Vertex> vertices = this.getAllVertices();
+		for (Vertex v : vertices) {
+			visited.put(v, false);
+			parent.put(v, null);
+			ap.put(v, false);
+		}
+ 
+		time = 0;
+		
+        // Call the recursive helper function to find articulation
+        // points in DFS tree rooted with vertex 'i'
+		for (Vertex v : vertices) {
+			if (!visited.get(v)) {
+				articulationPointsUtil(v, visited, disc, low, parent, ap);
+			}
+		}
+		
+		List<Vertex> result = new ArrayList<>();
+		for (Vertex v : vertices) {
+			if (ap.get(v)) {
+				result.add(v);
+			}
+		}
+		
+		return result;
+	}
 
+	public int time = 0;
+	
+	/**
+	 * A recursive function that find articulation points using DFS
+	 * 
+     * u --> The vertex to be visited next
+     * visited[] --> keeps tract of visited vertices
+     * disc[] --> Stores discovery times of visited vertices
+     * parent[] --> Stores parent vertices in DFS tree
+     * ap[] --> Store articulation points
+	 */
+    private void articulationPointsUtil(Vertex u, Map<Vertex, Boolean> visited,
+			Map<Vertex, Integer> disc, Map<Vertex, Integer> low,
+			Map<Vertex, Vertex> parent, Map<Vertex, Boolean> ap) {
+        // Count of children in DFS Tree
+        int children = 0;
+ 
+        // Mark the current node as visited
+        visited.put(u, true);
+ 
+        // Initialize discovery time and low value
+		time++;
+		disc.put(u, time);
+		low.put(u, time);
+ 
+        // Go through all vertices aadjacent to this
+        Iterator<Edge> i = this.adjList.get(u).iterator();
+        while (i.hasNext()) {
+            Vertex v = i.next().getDestination();  // v is current adjacent of u
+			
+            // If v is not visited yet, then make it a child of u
+            // in DFS tree and recur for it
+			if (!visited.get(v)) {
+                children++;
+				parent.put(v, u);
+                articulationPointsUtil(v, visited, disc, low, parent, ap);
+ 
+                // Check if the subtree rooted with v has a connection to
+                // one of the ancestors of u
+				low.put(u, Math.min(low.get(u), low.get(v)));
+ 
+                // "u" is an articulation point in following cases
+ 
+                // 1) "u" is root of DFS tree and has two or more chilren.
+                if (parent.get(u) == null && children >= 2) {
+                    ap.put(u, true);
+				}
+ 
+                // 2) If "u" is not root and low value of one of its child
+                // is more than discovery value of "u".
+                if (parent.get(u) != null && low.get(v) >= disc.get(u)) {
+                    ap.put(u, true);
+				}
+            } else if (v != parent.get(u)) {
+				// Update low value of u for parent function calls.
+				low.put(u, Math.min(low.get(u), disc.get(v)));
+			}
+        }
+    }
+
+	/**
+	 * Get all known vertices with all known neighbors
+	 * @param knownGraph
+	 * @return Graph
+	 */
+	public List<Vertex> getAllKnownVerticesWithAllKnownNeighbors(Graph knownGraph) {
+		List<Map.Entry<Vertex, List<Edge>>> list = new ArrayList<>(knownGraph.adjList.entrySet());
+		List<Vertex> result = new ArrayList<>();
+		for (Map.Entry<Vertex, List<Edge>> entryAux : list) {
+			// This can NOT be null (knownGraph is a subgraph)
+			Vertex originalVertex = this.getVertex(entryAux.getKey().getId());
+
+			// There is an known neighbor && with all neighbors known (!!)
+			if (this.getNeighbors(originalVertex).size() == knownGraph.getNeighbors(entryAux.getKey()).size()) {
+				result.add(entryAux.getKey());
+			}
+		}
+
+		return result;
+	}
+	
 }

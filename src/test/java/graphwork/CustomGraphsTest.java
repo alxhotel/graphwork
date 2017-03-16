@@ -6,7 +6,7 @@ import org.junit.Test;
 public class CustomGraphsTest {
 	
 	@Test
-	public void myGraph1Test() {
+	public void myGraphConstructiveTest() {
 		Graph graph = new Graph();
 		
 		graph.addEdge(0, 1, 1);
@@ -16,7 +16,7 @@ public class CustomGraphsTest {
 		graph.addEdge(2, 3, 5);
 		graph.addEdge(3, 4, 5);
 		
-		Finder finder = new Finder(graph);
+		Finder finder = new FinderConstructive(graph);
 		Graph result = finder.getMinimumCoverTree();
 		
 		// Validate result
