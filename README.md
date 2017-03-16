@@ -32,7 +32,7 @@ Tests check if the resulting graph is a tree and cover of the original.
 
 For now they are only executed based on "the most connected" criteria.
 
-Be patient they may take a while. Aprox. 90 sec. in a normal specs laptop.
+It take aprox. 5 sec. in a normal specs laptop.
 
 ## License
 
