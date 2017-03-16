@@ -75,6 +75,7 @@ public class CSV {
 			fileWriter.append(weight_least.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			fileWriter.append(time_least.toString());
+			fileWriter.append(COMMA_DELIMITER);
 			
 			// Least connected improved
 			fileWriter.append(weight_least_improved.toString());
