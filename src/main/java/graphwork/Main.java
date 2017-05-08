@@ -2,6 +2,7 @@ package graphwork;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class Main {
 
@@ -23,7 +24,7 @@ public class Main {
 		}
 		
 		// Set of large graphs
-		/*final File folderLarge = new File("./dtp_large");
+		final File folderLarge = new File("./dtp_large");
 		for (final File fileEntry : folderLarge.listFiles()) {
 			// Exclude bad files
 			if (!fileEntry.isDirectory()
@@ -34,7 +35,7 @@ public class Main {
 				calculateGraphResult(fileEntry);
 				
 			}
-		}*/
+		}
 	}
 	
 	private static void calculateGraphResult(File file) {
@@ -78,6 +79,22 @@ public class Main {
 		System.out.println("\tDestructivo Mejorado Original: " + graph.getTotalWeight());
 		System.out.println("\tDestructivo Mejorado New: " + weighAlgDestructiveImproved);
 		
+		//System.out.println(resultLeastConnectedDestructiveImproved.getAllVertices().toString());
+		
+		// Iterated Greedy - with "least connected for random destruction"
+		FinderIteratedGreedy finderIteratedGreedy = new FinderIteratedGreedy(graph);
+		long startTimeAlgIteratedGreedy = System.currentTimeMillis();
+		Graph resultIteratedGreedy = finderIteratedGreedy.getMinimumCoverTree();
+		long totalTimeAlgIteratedGreedy = System.currentTimeMillis() - startTimeAlgIteratedGreedy;
+		float weighAlgIteratedGreedy = resultIteratedGreedy.getTotalWeight();
+		
+		System.out.println("\tIterated Greedy Original: " + graph.getTotalWeight());
+		System.out.println("\tIterated Greedy New: " + weighAlgIteratedGreedy);
+		
+		//System.out.println(resultIteratedGreedy.getAllVertices().toString());
+		
+		//System.out.println(resultIteratedGreedy.getAllVertices());
+		
 		// Random
 		/*FinderRandom finderRandom = new FinderRandom(graph);
 		long startTimeRandom = System.currentTimeMillis();
@@ -90,7 +107,8 @@ public class Main {
 			file.getName(), graph.getTotalWeight(),
 			weighAlgConstructive, totalTimeAlgConstructive,
 			weighAlgDestructive, totalTimeAlgDestructive,
-			weighAlgDestructiveImproved, totalTimeAlgDestructiveImproved);
+			weighAlgDestructiveImproved, totalTimeAlgDestructiveImproved,
+			weighAlgIteratedGreedy, totalTimeAlgIteratedGreedy);
 	}
 	
 }

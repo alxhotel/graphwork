@@ -29,8 +29,6 @@ public class FinderDestructiveImproved extends Finder {
 			if (solutionArray.isEmpty()) {
 				// No more vertices available
 				
-				// Finished: Make sure graph is a tree
-				this.newGraph.convertToTree();
 				break;
 			}
 			
@@ -42,8 +40,6 @@ public class FinderDestructiveImproved extends Finder {
 			if (solutionArray.isEmpty()) {
 				// No more vertices available
 				
-				// Finished: Make sure graph is a tree
-				this.newGraph.convertToTree();
 				break;
 			}
 			
@@ -64,6 +60,9 @@ public class FinderDestructiveImproved extends Finder {
 			// Remove vertex
 			this.newGraph.removeVertex(selectedVertex);
 		}
+		
+		// Finished: Make sure graph is a tree
+		this.newGraph.convertToTree();
 		
 		return this.newGraph;
 	}

@@ -15,7 +15,8 @@ public class CSV {
 			+ "Weigh of Original Graph,"
 			+ "Weigh of Most Connected,Time of Most Connected (ms),"
 			+ "Weigh of Least Connected,Time of Least Connected (ms),"
-			+ "Weigh of Least Connected Improved,Time of Least Connected Improved (ms)";
+			+ "Weigh of Least Connected Improved,Time of Least Connected Improved (ms),"
+			+ "Weigh of Iterated Greedy #" + FinderIteratedGreedy.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy #" + FinderIteratedGreedy.DEFAULT_NUM_TRIES + " (ms)";
 	
 	public static void createResultsFile(String filePath) {
 		PrintWriter writer;
@@ -53,7 +54,8 @@ public class CSV {
 			String name, Float weight_original,
 			Float weight_alg, Long time_alg,
 			Float weight_least, Long time_least,
-			Float weight_least_improved, Long time_least_improved) {
+			Float weight_least_improved, Long time_least_improved,
+			Float weight_iterated_greedy, Long time_iterated_greedy) {
 		
 		FileWriter fileWriter = null;
         try {
@@ -81,6 +83,12 @@ public class CSV {
 			fileWriter.append(weight_least_improved.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			fileWriter.append(time_least_improved.toString());
+			fileWriter.append(COMMA_DELIMITER);
+			
+			// Iterated greedy
+			fileWriter.append(weight_iterated_greedy.toString());
+			fileWriter.append(COMMA_DELIMITER);
+			fileWriter.append(time_iterated_greedy.toString());
 			
 			// New line
 			fileWriter.append(NEW_LINE_SEPARATOR);

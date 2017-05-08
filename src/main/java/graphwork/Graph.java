@@ -463,7 +463,7 @@ public class Graph {
 
 	public Float getTotalWeight() {
 		float weightTotal = 0;
-		for (Map.Entry<Vertex, Edge> entry : getAllUniqueEdges()) {
+		for (Map.Entry<Vertex, Edge> entry : this.getAllUniqueEdges()) {
 			weightTotal += entry.getValue().getWeight();
 		}
 		
@@ -672,6 +672,103 @@ public class Graph {
 		}
 
 		return result;
+	}
+
+	public List<Vertex> getRandomNodes(int numOfNodes) {
+		Random generator = new Random();
+		List<Vertex> allVertices = new ArrayList<>();
+		allVertices.addAll(this.adjList.keySet());
+		
+		List<Vertex> list = new ArrayList<>();
+		for (int i = 0; i < numOfNodes; i++) {
+			int index = generator.nextInt(allVertices.size());
+			Vertex auxVertex = allVertices.remove(index);
+			
+			list.add(auxVertex);
+		}
+		
+		return list;
+	}
+
+	public void addVertexFromKnownGraph(Vertex newVertex, Graph graph) throws Exception {
+		if (!graph.existsVertex(newVertex)) {
+			throw new Exception("newVertex is not in known graph");
+		}
+		
+		// Add vertex
+		this.addVertex(newVertex);
+		
+		// Add edges (if any)
+		List<Edge> edges = graph.getNeighbors(newVertex);
+
+		for (Edge edgeAux : edges) {
+			if (this.existsVertex(edgeAux.getDestination())) {
+				// Add edge from newVertex to destination
+				Vertex destinationVertex = this.getVertex(edgeAux.getDestination().getId());
+				this.addEdge(newVertex, destinationVertex, edgeAux.getWeight());
+			}
+		}
+	}
+
+	public List<Vertex> getRandomNodesExceptOther(int numOfNodes, Set<Vertex> exceptionList) {
+		Random generator = new Random();
+		List<Vertex> allVertices = new ArrayList<>();
+		allVertices.addAll(this.adjList.keySet());
+		allVertices.removeAll(exceptionList);
+		
+		List<Vertex> list = new ArrayList<>();
+		for (int i = 0; i < numOfNodes; i++) {
+			int index = generator.nextInt(allVertices.size());
+			Vertex auxVertex = allVertices.remove(index);
+			
+			list.add(auxVertex);
+		}
+		
+		return list;
+	}
+
+	/**
+	 * Get all vertices adjacent to known subgraph
+	 * @param subGraph
+	 * @return 
+	 */
+	public List<Vertex> getAllVerticesNeighbourToKnownSubgraph(Graph subGraph) {
+		List<Vertex> result = new ArrayList<>();
+		
+		List<Vertex> allVertices = subGraph.getAllVertices();
+		
+		// If empty, all vertices are adjacent to empty subgraph
+		if (allVertices.isEmpty()) {
+			result.addAll(this.getAllVertices());
+			return result;
+		}
+		
+		for (Vertex auxVertex : allVertices) {
+			List<Edge> neighbours = this.getNeighbors(auxVertex);
+			
+			// Coditional optimization
+			if (subGraph.getNeighbors(auxVertex).size() < neighbours.size()) {
+				for (Edge auxEdge : neighbours) {
+					if (!subGraph.existsVertex(auxEdge.getDestination())) {
+						result.add(auxEdge.getDestination());
+					}
+				}
+			}
+		}
+		
+		return result;
+	}
+
+	public int countKnownVertices(Set<Vertex> vertices) {
+		int count = 0;
+		
+		for (Vertex aux : vertices) {
+			if (this.existsVertex(aux)) {
+				count++;
+			}
+		}
+		
+		return count;
 	}
 	
 }

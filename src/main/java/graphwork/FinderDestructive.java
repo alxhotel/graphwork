@@ -44,24 +44,34 @@ public class FinderDestructive extends Finder {
 				}
 			});
 			
-			// Selected vertex
-			Vertex selectedVertex = solutionArray.get(0);
+			// Selected vertex from the list
+			Graph test;
+			while (!solutionArray.isEmpty()) {
+				Vertex selectedVertex = solutionArray.get(0);
 			
-			// Try to remove the vertex
-			Graph test = new Graph(newGraph);
-			test.removeVertex(selectedVertex);
-			
-			if (!test.isConnected()) {
-				// Wrong: it broke the graph
+				// Try to remove the vertex
+				test = new Graph(newGraph);
+				test.removeVertex(selectedVertex);
+
+				if (!test.isConnected()) {
+					// Wrong: it broke the graph
+
+					// Try the next one
+				} else {
+					// All correct: lets remove it
+
+					// And continue
+					newGraph.removeVertex(selectedVertex);
+					break;
+				}
 				
+				solutionArray.remove(0);
+			}
+			
+			if (solutionArray.isEmpty()) {
 				// Finished: Make sure graph is a tree
 				newGraph.convertToTree();
 				break;
-			} else {
-				// All correct: lets remove it
-
-				// And continue
-				newGraph.removeVertex(selectedVertex);
 			}
 		}
 		
