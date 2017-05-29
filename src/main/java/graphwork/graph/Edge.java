@@ -1,4 +1,4 @@
-package graphwork;
+package graphwork.graph;
 
 import java.util.Objects;
 

@@ -1,6 +1,12 @@
 package graphwork;
 
-import static graphwork.Reader.createGraph;
+import graphwork.graph.Graph;
+import graphwork.finder.FinderConstructive;
+import graphwork.finder.FinderDestructive;
+import graphwork.finder.FinderDestructiveImproved;
+import graphwork.finder.Finder;
+import graphwork.finder.FinderConstructiveImproved;
+import static graphwork.utils.Reader.createGraph;
 import java.io.File;
 import java.io.IOException;
 import org.junit.Test;
@@ -13,11 +19,14 @@ public class AllGraphsTest {
 		final File folder = new File("./dtp_small");
 		for (final File fileEntry : folder.listFiles()) {
 			if (!fileEntry.isDirectory()) {
+				// Read graph
 				Graph graph = readGraphFile(fileEntry);
 				
+				// Execute all finders
 				oneGraphConstructiveTest(graph);
 				oneGraphDestructiveTest(graph);
 				oneGraphDestructiveImprovedTest(graph);
+				oneGraphConstructiveImprovedTest(graph);
 			}
 		}
 	}
@@ -31,11 +40,14 @@ public class AllGraphsTest {
 				&& !fileEntry.getName().equals("dtp_300_1000_0.txt")
 				&& !fileEntry.getName().equals("dtp_300_1000_1.txt")
 				&& !fileEntry.getName().equals("dtp_300_1000_2.txt")) {
+				// Read graph
 				Graph graph = readGraphFile(fileEntry);
 				
+				// Execute all finders
 				oneGraphConstructiveTest(graph);
 				oneGraphDestructiveTest(graph);
 				oneGraphDestructiveImprovedTest(graph);
+				oneGraphConstructiveImprovedTest(graph);
 			}
 		}
 	}
@@ -56,6 +68,17 @@ public class AllGraphsTest {
 	
 	private void oneGraphConstructiveTest(Graph graph) {
 		Finder finder = new FinderConstructive(graph);
+		Graph result = finder.getMinimumCoverTree();
+		
+		// Validate result
+		assertTrue(result.isTree());
+		assertTrue(result.isVertexCoverOf(graph));
+		
+		System.out.println("Weight of the tree cover: " + result.getTotalWeight());
+	}
+	
+	private void oneGraphConstructiveImprovedTest(Graph graph) {
+		Finder finder = new FinderConstructiveImproved(graph);
 		Graph result = finder.getMinimumCoverTree();
 		
 		// Validate result
@@ -86,4 +109,5 @@ public class AllGraphsTest {
 		
 		System.out.println("Weight of the tree cover: " + result.getTotalWeight());
 	}
+	
 }

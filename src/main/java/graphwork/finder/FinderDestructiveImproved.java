@@ -1,5 +1,7 @@
-package graphwork;
+package graphwork.finder;
 
+import graphwork.graph.Graph;
+import graphwork.graph.Vertex;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class FinderDestructiveImproved extends Finder {
 		// Select the whole graph (clone it)
 		this.newGraph = new Graph(this.graph);
 
+		// [Observation]: It is always a cover and connected
 		while (true) {
 			// Get known vertices with all known neighbors
 			List<Vertex> solutionArray = this.graph.getAllKnownVerticesWithAllKnownNeighbors(this.newGraph);
@@ -54,17 +57,13 @@ public class FinderDestructiveImproved extends Finder {
 				}
 			});
 			
-			// Selected vertex
+			// Remove selected vertex
 			Vertex selectedVertex = solutionArray.get(0);
-			
-			// Remove vertex
 			this.newGraph.removeVertex(selectedVertex);
 		}
-		
-		// Finished: Make sure graph is a tree
-		this.newGraph.convertToTree();
-		
-		return this.newGraph;
+
+		// Finished: Make sure graph is a minimum spanning tree
+		return this.newGraph.getMST();
 	}
 	
 }

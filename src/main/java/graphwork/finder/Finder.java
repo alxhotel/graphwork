@@ -1,4 +1,6 @@
-package graphwork;
+package graphwork.finder;
+
+import graphwork.graph.Graph;
 
 public abstract class Finder {
 	

@@ -1,8 +1,9 @@
-package graphwork;
+package graphwork.finder;
 
+import graphwork.graph.Graph;
+import graphwork.graph.Vertex;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class FinderDestructive extends Finder {
 
@@ -22,14 +23,13 @@ public class FinderDestructive extends Finder {
 		// Select the whole graph (clone it)
 		this.newGraph = new Graph(this.graph);
 		
+		// [Observation]: It is always a cover and connected
 		while (true) {
 			// Get known vertices with all known neighbors
 			List<Vertex> solutionArray = this.graph.getAllKnownVerticesWithAllKnownNeighbors(this.newGraph);
 			if (solutionArray.isEmpty()) {
 				// No more vertices available
 				
-				// Finished: Make sure graph is a tree
-				this.newGraph.convertToTree();
 				break;
 			}
 			
@@ -50,13 +50,14 @@ public class FinderDestructive extends Finder {
 				Vertex selectedVertex = solutionArray.get(0);
 			
 				// Try to remove the vertex
-				test = new Graph(newGraph);
+				test = new Graph(this.newGraph);
 				test.removeVertex(selectedVertex);
 
 				if (!test.isConnected()) {
 					// Wrong: it broke the graph
 
 					// Try the next one
+					solutionArray.remove(0);
 				} else {
 					// All correct: lets remove it
 
@@ -64,26 +65,17 @@ public class FinderDestructive extends Finder {
 					newGraph.removeVertex(selectedVertex);
 					break;
 				}
-				
-				solutionArray.remove(0);
 			}
 			
 			if (solutionArray.isEmpty()) {
-				// Finished: Make sure graph is a tree
-				newGraph.convertToTree();
+				// None of the available vertices were suitable
+				
 				break;
 			}
 		}
 		
-		return newGraph;
-	}
-	
-	/**
-	 * Method #2
-	 * Return the least connected, known & neighbor node
-	 */
-	private Map.Entry<Vertex, Graph> searchLeastConnectedKnownNeighborNode() {
-		return graph.getLeastConnectedKnownNeighborNode(newGraph);
+		// Finished: Make sure graph is a minimum spanning tree
+		return this.newGraph.getMST();
 	}
 	
 }

@@ -1,4 +1,4 @@
-package graphwork;
+package graphwork.graph;
 
 public class Vertex {
 

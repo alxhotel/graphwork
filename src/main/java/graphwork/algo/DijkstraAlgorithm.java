@@ -1,5 +1,8 @@
-package graphwork;
+package graphwork.algo;
 
+import graphwork.graph.Edge;
+import graphwork.graph.Graph;
+import graphwork.graph.Vertex;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -1,5 +1,7 @@
-package graphwork;
+package graphwork.finder;
 
+import graphwork.graph.Graph;
+import graphwork.graph.Vertex;
 import java.util.AbstractMap;
 import java.util.Map;
 

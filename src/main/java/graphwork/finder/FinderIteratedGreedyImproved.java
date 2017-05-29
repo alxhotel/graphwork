@@ -1,23 +1,26 @@
-package graphwork;
+package graphwork.finder;
 
+import graphwork.graph.Graph;
+import graphwork.graph.Vertex;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class FinderIteratedGreedy extends Finder {
+public class FinderIteratedGreedyImproved extends Finder {
 
 	public static final float DEFAULT_RANDOM_PERCENTAGE = 0.5f;
-	public static final int DEFAULT_NUM_TRIES = 200;
+	public static final int DEFAULT_NUM_TRIES = 300;
 	
-	public FinderIteratedGreedy(Graph graph) {
+	public FinderIteratedGreedyImproved(Graph graph) {
 		super(graph);
 	}
 	
 	@Override
 	public Graph getMinimumCoverTree() {
 		try {
-			// Use default calues
+			// Use default values
 			return this.getMinimumCoverTree(DEFAULT_RANDOM_PERCENTAGE, DEFAULT_NUM_TRIES);
 		} catch (Exception ignored) {
 			ignored.printStackTrace();
@@ -30,16 +33,18 @@ public class FinderIteratedGreedy extends Finder {
 	 * Note:
 	 * - It uses de "destructive improved"
 	 * - It uses articulation points
+	 * - It's improved because it moves the last deleted nodes
+	 * to the end of the list of the candidates to be added
 	 * 
-	 * @param randomPercentage - percentage of the graph to destroy 
+	 * @param destroyPercentage - percentage of the graph to destroy 
 	 * @param numOfTries - number of times until we give up
 	 * @return Graph
 	 * @throws java.lang.Exception
 	 */
-	public Graph getMinimumCoverTree(float randomPercentage, int numOfTries) throws Exception {
+	public Graph getMinimumCoverTree(float destroyPercentage, int numOfTries) throws Exception {
 		// Validate params
-		if (randomPercentage > 1 || randomPercentage <= 0) {
-			throw new Exception("randomPercentage must be between 0 and 1");
+		if (destroyPercentage <= 0 || destroyPercentage > 1) {
+			throw new Exception("destroyPercentage must be between 0 and 1");
 		}
 		if (numOfTries < 0) {
 			throw new Exception("numOfTimes must be bigger than 0");
@@ -51,19 +56,11 @@ public class FinderIteratedGreedy extends Finder {
 		// Initial graph (least connected)
 		this.constructSolution();
 		
-		// [Debug]
-		//if (!this.newGraph.isVertexCoverOf(this.graph)) {
-		//	throw new Exception("Something went wrong");
-		//}
-		//if (!this.newGraph.isConnected()) {
-		//	throw new Exception("Something went wrong");
-		//}
-		
 		// Calculate original articulation points
 		//List<Vertex> originalArticulationPoints = this.newGraph.getArticulationPoints();
 		
 		Graph bestGraph = new Graph(this.newGraph);
-		float bestWeight = bestGraph.getTotalWeight();
+		float bestMSTWeight = bestGraph.getTotalWeightOfMST();
 		
 		for (int currentNumberOfTimes = 0; currentNumberOfTimes < numOfTries; currentNumberOfTimes++) {
 			// Articulation points
@@ -72,26 +69,11 @@ public class FinderIteratedGreedy extends Finder {
 			//totalArticulationPoints.addAll(originalArticulationPoints);
 			int numTotalArticulationPoints = this.newGraph.countKnownVertices(totalArticulationPoints);
 			
-			// [Debug]
-			//if (this.newGraph.isVertexCoverOf(this.graph)) {
-			//	System.out.println("IS COVER:");
-			//}
-			//System.out.println(this.newGraph.getAllVertices());
-			
 			// Destroy graph (randomly)
-			int numOfVerticesToRemove = (int) Math.ceil((this.newGraph.getNumOfVertices() - numTotalArticulationPoints) * randomPercentage);
+			int numOfVerticesToRemove = (int) Math.ceil((this.newGraph.getNumOfVertices() - numTotalArticulationPoints) * destroyPercentage);
 			List<Vertex> vertices = this.newGraph.getRandomNodesExceptOther(numOfVerticesToRemove, totalArticulationPoints);
-			
-			// [Debug]
-			//System.out.println("Remove N nodes:");
-			//System.out.println(numOfVerticesToRemove);
-			
+
 			for (Vertex aux : vertices) {
-				// [Debug]
-				//System.out.println("Remove (num of edges):");
-				//System.out.println(aux);
-				//System.out.println(this.newGraph.getEdges(aux.getId()).size());
-				
 				// Recalculate articulation points
 				Set<Vertex> newArticulationPoints = new HashSet<>(this.newGraph.getArticulationPoints());
 				
@@ -103,9 +85,8 @@ public class FinderIteratedGreedy extends Finder {
 			// Construct graph (by most connected)
 			List<Vertex> verticesToAdd;
 			while (!this.newGraph.isVertexCoverOf(this.graph)) {
+				verticesToAdd = this.graph.getAllUnknownVerticesNeighbourToKnownSubgraph(this.newGraph);
 				
-				// TODO: merge these two lines into one loop
-				verticesToAdd = this.graph.getAllVerticesNeighbourToKnownSubgraph(this.newGraph);
 				// Order by most connected
 				Collections.sort(verticesToAdd, (Vertex t, Vertex t1) -> {
 					if (this.graph.getNeighbors(t).size() < this.graph.getNeighbors(t1).size()) {
@@ -117,53 +98,33 @@ public class FinderIteratedGreedy extends Finder {
 					}
 				});
 				
-				// [Debug]
-				//if (verticesToAdd.isEmpty()) {
-				//	throw new Exception("Something went wrong");
-				//}
+				// [IMPROVEMENT]: Put the currently removed nodes at the end of the list
+				List<Vertex> common = new ArrayList<>(verticesToAdd);
+				common.retainAll(vertices);
+				verticesToAdd.removeAll(common);
+				verticesToAdd.addAll(common);
 				
 				// Add most connected unknown neighbour node
-				Vertex nextVertex = verticesToAdd.remove(0);
-				
-				this.newGraph.addVertexFromKnownGraph(nextVertex, this.graph);
-				
-				// [Debug]
-				//System.out.println("Add (num of edges):");
-				//System.out.println(nextVertex);
-				//if (this.newGraph.getEdges(nextVertex.getId()) == null) {
-				//	System.out.println("WROOOOONG AT ADDING");
-				//}
-				//System.out.println(this.newGraph.getEdges(nextVertex.getId()).size());
+				Vertex nextVertex = verticesToAdd.get(0);
+				this.newGraph.addVertexFromKnownSupergraph(nextVertex, this.graph);
 			}
 			
-			// [Debug]
-			//System.out.println("Fin:");
-			//System.out.println(this.newGraph.getAllVertices());
-			
-			// [Debug]
-			//if (!this.newGraph.isConnected()) {
-			//	throw new Exception("Something went wrong");
-			//}
-			
 			// Checkout new try
-			float newWeight = this.newGraph.getTotalWeight();
-			if (newWeight < bestWeight) {
-				bestWeight = newWeight;
+			float newMSTWeight = this.newGraph.getTotalWeightOfMST();
+			if (newMSTWeight < bestMSTWeight) {
+				bestMSTWeight = newMSTWeight;
 				bestGraph = new Graph(this.newGraph);
 			}
 		}
 		
-		// Convert to tree
-		bestGraph.convertToTree();
-		
-		return bestGraph;
+		// Finished: Generate the minimum spanning tree
+		return bestGraph.getMST();
 	}
 	
 	/**
 	 * Remove least connected nodes
-	 * @return 
 	 */
-	private void constructSolution() {
+	protected void constructSolution() {
 		// [Observation]: It is always a cover and connected
 		while (true) {
 			// Get known vertices with all known neighbors
@@ -196,15 +157,10 @@ public class FinderIteratedGreedy extends Finder {
 				}
 			});
 			
-			// Selected vertex
+			// Remove selected vertex
 			Vertex selectedVertex = solutionArray.get(0);
-			
-			// Remove vertex
 			this.newGraph.removeVertex(selectedVertex);
 		}
-
-		// Finished: Make sure graph is a tree
-		this.newGraph.convertToTree();
 	}
 	
 }

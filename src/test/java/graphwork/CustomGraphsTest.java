@@ -1,5 +1,8 @@
 package graphwork;
 
+import graphwork.graph.Graph;
+import graphwork.finder.FinderConstructive;
+import graphwork.finder.Finder;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

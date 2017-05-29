@@ -1,5 +1,7 @@
-package graphwork;
+package graphwork.graph;
 
+import graphwork.algo.KruskalAlgorithm;
+import graphwork.finder.RandomSingleton;
 import java.util.*;
 
 public class Graph {
@@ -102,11 +104,11 @@ public class Graph {
 	}
 
 	public Vertex getVertex(int vertexId) {
-		return new Vertex(vertexId);
+		return this.existsVertex(vertexId) ? new Vertex(vertexId) : null;
 	}
 
 	public List<Edge> getEdges(int vertexId) {
-		return adjList.get(new Vertex(vertexId));
+		return adjList.get(this.getVertex(vertexId));
 	}
 	
 	public List<Edge> getNeighbors(Vertex key) {
@@ -127,6 +129,10 @@ public class Graph {
 		Random generator = new Random();
 		Vertex[] keys = (Vertex[]) this.adjList.keySet().toArray();
 		return keys[generator.nextInt(keys.length)];
+	}
+	
+	public Boolean existsVertex(int vertexId) {
+		return this.adjList.containsKey(new Vertex(vertexId));
 	}
 	
 	public Boolean existsVertex(Vertex key) {
@@ -471,6 +477,17 @@ public class Graph {
 	}
 	
 	/**
+	 * Get total weight of MST
+	 * Note:
+	 * - Using Kruskal algorithm
+	 * @return 
+	 */
+	public Float getTotalWeightOfMST() {
+		Graph newMST = this.getMST();
+		return newMST.getTotalWeight();
+	}
+	
+	/**
 	 * Get if graph is connected
 	 * @return boolean
 	 */
@@ -510,20 +527,23 @@ public class Graph {
 	
 	/**
 	 * Convert any connected graph to a tree, by removing the cycles
+	 * @return Tree
 	 */
-	public void convertToTree() {
+	public Graph convertToTree() {
 		// Mark all the vertices as not visited and not part
 		// of recursion stack
 		Map<Vertex, Boolean> visitedMap = new HashMap<>();
-		for (Map.Entry<Vertex, List<Edge>> entry : adjList.entrySet()) {
+		for (Map.Entry<Vertex, List<Edge>> entry : this.adjList.entrySet()) {
 			visitedMap.put(entry.getKey(), false);
 		}
 		
 		// Just in case
-		if (adjList.size() > 0) {
-			Vertex anyVertex = adjList.entrySet().iterator().next().getKey();
+		if (this.adjList.size() > 0) {
+			Vertex anyVertex = this.adjList.entrySet().iterator().next().getKey();
 			convertToTreeUtil(anyVertex, visitedMap, null);
 		}
+		
+		return this;
 	}
 	
 	private void convertToTreeUtil(Vertex currentVertex, Map<Vertex, Boolean> visitedMap, Vertex parent) {
@@ -550,7 +570,16 @@ public class Graph {
 			}
 		}
 	}
- 
+	
+	/**
+	 * Get Minimum Spanning Tree
+	 * @return 
+	 */
+	public Graph getMST() {
+		KruskalAlgorithm krustkalAlgo = new KruskalAlgorithm(this);
+		return krustkalAlgo.getMinimumSpanningTree();
+	}
+	
     /**
 	 * The function to do DFS traversal. It uses recursive function APUtil()
 	 * 
@@ -659,18 +688,30 @@ public class Graph {
 	 * @return Graph
 	 */
 	public List<Vertex> getAllKnownVerticesWithAllKnownNeighbors(Graph knownGraph) {
-		List<Map.Entry<Vertex, List<Edge>>> list = new ArrayList<>(knownGraph.adjList.entrySet());
-		List<Vertex> result = new ArrayList<>();
-		for (Map.Entry<Vertex, List<Edge>> entryAux : list) {
+		List<Vertex> list = knownGraph.getAllVertices();
+		
+		Set<Vertex> internalResult = new HashSet<>();
+		for (Vertex vertexAux : list) {
 			// This can NOT be null (knownGraph is a subgraph)
-			Vertex originalVertex = this.getVertex(entryAux.getKey().getId());
+			Vertex originalVertex = this.getVertex(vertexAux.getId());
 
 			// There is an known neighbor && with all neighbors known (!!)
-			if (this.getNeighbors(originalVertex).size() == knownGraph.getNeighbors(entryAux.getKey()).size()) {
-				result.add(entryAux.getKey());
+			boolean allNeighboursAreKnown = true;
+			for (Edge edgeAux : this.getNeighbors(originalVertex)) {
+				if (!knownGraph.existsVertex(edgeAux.getDestination())) {
+					allNeighboursAreKnown = false;
+					break;
+				}
+			}
+			
+			if (allNeighboursAreKnown) {
+				internalResult.add(vertexAux);
 			}
 		}
 
+		List<Vertex> result = new ArrayList<>();
+		result.addAll(internalResult);
+		
 		return result;
 	}
 
@@ -690,8 +731,8 @@ public class Graph {
 		return list;
 	}
 
-	public void addVertexFromKnownGraph(Vertex newVertex, Graph graph) throws Exception {
-		if (!graph.existsVertex(newVertex)) {
+	public void addVertexFromKnownSupergraph(Vertex newVertex, Graph knownGraph) throws Exception {
+		if (!knownGraph.existsVertex(newVertex)) {
 			throw new Exception("newVertex is not in known graph");
 		}
 		
@@ -699,7 +740,7 @@ public class Graph {
 		this.addVertex(newVertex);
 		
 		// Add edges (if any)
-		List<Edge> edges = graph.getNeighbors(newVertex);
+		List<Edge> edges = knownGraph.getNeighbors(newVertex);
 
 		for (Edge edgeAux : edges) {
 			if (this.existsVertex(edgeAux.getDestination())) {
@@ -710,14 +751,26 @@ public class Graph {
 		}
 	}
 
-	public List<Vertex> getRandomNodesExceptOther(int numOfNodes, Set<Vertex> exceptionList) {
-		Random generator = new Random();
+	/**
+	 * Get a number of random nodes except the ones in the list
+	 * @param numOfNodes
+	 * @param exceptionList
+	 * @return 
+	 */
+	public List<Vertex> getRandomNodesExceptOther(int numOfNodes, Collection<Vertex> exceptionList) {
+		// Use a random singleton
+		RandomSingleton generator = RandomSingleton.getInstance();
 		List<Vertex> allVertices = new ArrayList<>();
-		allVertices.addAll(this.adjList.keySet());
+		allVertices.addAll(this.getAllVertices());
 		allVertices.removeAll(exceptionList);
 		
 		List<Vertex> list = new ArrayList<>();
 		for (int i = 0; i < numOfNodes; i++) {
+			if (allVertices.isEmpty()) {
+				// numOfNodes was bigger than the actual nodes we could grab
+				break;
+			}
+			
 			int index = generator.nextInt(allVertices.size());
 			Vertex auxVertex = allVertices.remove(index);
 			
@@ -728,34 +781,35 @@ public class Graph {
 	}
 
 	/**
-	 * Get all vertices adjacent to known subgraph
-	 * @param subGraph
+	 * Get all unknown vertices adjacent to known subgraph
+	 * @param knownSubGraph
 	 * @return 
 	 */
-	public List<Vertex> getAllVerticesNeighbourToKnownSubgraph(Graph subGraph) {
-		List<Vertex> result = new ArrayList<>();
+	public List<Vertex> getAllUnknownVerticesNeighbourToKnownSubgraph(Graph knownSubGraph) {
+		Set<Vertex> internalResult = new HashSet<>();
 		
-		List<Vertex> allVertices = subGraph.getAllVertices();
+		List<Vertex> allVertices = knownSubGraph.getAllVertices();
 		
 		// If empty, all vertices are adjacent to empty subgraph
 		if (allVertices.isEmpty()) {
-			result.addAll(this.getAllVertices());
-			return result;
+			internalResult.addAll(this.getAllVertices());
 		}
 		
 		for (Vertex auxVertex : allVertices) {
 			List<Edge> neighbours = this.getNeighbors(auxVertex);
 			
 			// Coditional optimization
-			if (subGraph.getNeighbors(auxVertex).size() < neighbours.size()) {
+			if (knownSubGraph.getNeighbors(auxVertex).size() < neighbours.size()) {
 				for (Edge auxEdge : neighbours) {
-					if (!subGraph.existsVertex(auxEdge.getDestination())) {
-						result.add(auxEdge.getDestination());
+					if (!knownSubGraph.existsVertex(auxEdge.getDestination())) {
+						internalResult.add(auxEdge.getDestination());
 					}
 				}
 			}
 		}
 		
+		List<Vertex> result = new ArrayList<>();
+		result.addAll(internalResult);
 		return result;
 	}
 
