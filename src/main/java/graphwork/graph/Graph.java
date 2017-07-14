@@ -665,7 +665,7 @@ public class Graph {
  
                 // "u" is an articulation point in following cases
  
-                // 1) "u" is root of DFS tree and has two or more chilren.
+                // 1) "u" is root of DFS tree and has at least two chilren.
                 if (parent.get(u) == null && children >= 2) {
                     ap.put(u, true);
 				}
@@ -755,11 +755,12 @@ public class Graph {
 	 * Get a number of random nodes except the ones in the list
 	 * @param numOfNodes
 	 * @param exceptionList
+	 * @param randomSeed
 	 * @return 
 	 */
-	public List<Vertex> getRandomNodesExceptOther(int numOfNodes, Collection<Vertex> exceptionList) {
+	public List<Vertex> getRandomNodesExceptOther(int numOfNodes, Collection<Vertex> exceptionList, int randomSeed) {
 		// Use a random singleton
-		RandomSingleton generator = RandomSingleton.getInstance();
+		RandomSingleton generator = RandomSingleton.getInstance(randomSeed);
 		List<Vertex> allVertices = new ArrayList<>();
 		allVertices.addAll(this.getAllVertices());
 		allVertices.removeAll(exceptionList);

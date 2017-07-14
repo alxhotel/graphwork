@@ -25,8 +25,8 @@ public class Reader {
 			// Check if graph has weights
 			if (auxLine.length == 3) {
 				// Use weights
-				//newGraph.addEdge(Integer.parseInt(auxLine[0]), Integer.parseInt(auxLine[1]), Float.parseFloat(auxLine[2]));
-				newGraph.addEdge(Integer.parseInt(auxLine[0]), Integer.parseInt(auxLine[1]), 1f);
+				newGraph.addEdge(Integer.parseInt(auxLine[0]), Integer.parseInt(auxLine[1]), Float.parseFloat(auxLine[2]));
+				//newGraph.addEdge(Integer.parseInt(auxLine[0]), Integer.parseInt(auxLine[1]), 1f);
 			} else {
 				// There is no weights, normalize to 1
 				newGraph.addEdge(Integer.parseInt(auxLine[0]), Integer.parseInt(auxLine[1]), 1f);

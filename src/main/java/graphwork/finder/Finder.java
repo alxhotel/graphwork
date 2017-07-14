@@ -18,6 +18,6 @@ public abstract class Finder {
 	 * Get the minimum cover tree for the given graph
 	 * @return Graph
 	 */
-	public abstract Graph getMinimumCoverTree();
+	public abstract Graph getMinimumTreeCover();
 	
 }

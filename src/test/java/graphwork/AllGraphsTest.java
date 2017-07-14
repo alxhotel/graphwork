@@ -24,9 +24,9 @@ public class AllGraphsTest {
 				
 				// Execute all finders
 				oneGraphConstructiveTest(graph);
+				oneGraphConstructiveImprovedTest(graph);
 				oneGraphDestructiveTest(graph);
 				oneGraphDestructiveImprovedTest(graph);
-				oneGraphConstructiveImprovedTest(graph);
 			}
 		}
 	}
@@ -45,9 +45,9 @@ public class AllGraphsTest {
 				
 				// Execute all finders
 				oneGraphConstructiveTest(graph);
+				oneGraphConstructiveImprovedTest(graph);
 				oneGraphDestructiveTest(graph);
 				oneGraphDestructiveImprovedTest(graph);
-				oneGraphConstructiveImprovedTest(graph);
 			}
 		}
 	}
@@ -68,7 +68,7 @@ public class AllGraphsTest {
 	
 	private void oneGraphConstructiveTest(Graph graph) {
 		Finder finder = new FinderConstructive(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph result = finder.getMinimumTreeCover();
 		
 		// Validate result
 		assertTrue(result.isTree());
@@ -79,7 +79,7 @@ public class AllGraphsTest {
 	
 	private void oneGraphConstructiveImprovedTest(Graph graph) {
 		Finder finder = new FinderConstructiveImproved(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph result = finder.getMinimumTreeCover();
 		
 		// Validate result
 		assertTrue(result.isTree());
@@ -90,7 +90,7 @@ public class AllGraphsTest {
 	
 	private void oneGraphDestructiveTest(Graph graph) {
 		Finder finder = new FinderDestructive(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph result = finder.getMinimumTreeCover();
 		
 		// Validate result
 		assertTrue(result.isTree());
@@ -101,7 +101,7 @@ public class AllGraphsTest {
 	
 	private void oneGraphDestructiveImprovedTest(Graph graph) {
 		Finder finder = new FinderDestructiveImproved(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph result = finder.getMinimumTreeCover();
 		
 		// Validate result
 		assertTrue(result.isTree());

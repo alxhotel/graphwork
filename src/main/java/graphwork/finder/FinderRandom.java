@@ -12,7 +12,7 @@ public class FinderRandom extends Finder {
 	}
 	
 	@Override
-	public Graph getMinimumCoverTree() {
+	public Graph getMinimumTreeCover() {
 		// 3) Get a random unknown node, based on my current "newGraph" + path
 		//nodeAndPath = searchRandomNode();
 		

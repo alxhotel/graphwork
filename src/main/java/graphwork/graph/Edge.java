@@ -39,6 +39,11 @@ public class Edge {
 	}
 	
 	@Override
+	public int hashCode() {
+		return this.destination.getId();
+	}
+	
+	@Override
 	public String toString() {
 		return "(" + destination + ", " + weight + ")";
 	}

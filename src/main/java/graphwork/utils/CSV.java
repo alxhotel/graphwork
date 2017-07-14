@@ -1,34 +1,53 @@
 package graphwork.utils;
 
-import graphwork.finder.FinderIteratedGreedy;
+import graphwork.Result;
+import graphwork.ResultIG;
 import graphwork.finder.FinderIteratedGreedyCustom;
 import graphwork.finder.FinderIteratedGreedyImproved;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 public class CSV {
 	
 	private static final String COMMA_DELIMITER = ",";
     private static final String NEW_LINE_SEPARATOR = "\n";
 
-	private static final String FILE_HEADER = ""
+	public static final String CONSTRUCTIVE_FILE_HEADER = ""
 			+ "Graph Name,"
 			+ "Weigh of Original Graph,"
-			+ "Weigh of Most Connected,Time of Most Connected (ms),"
-			+ "Weigh of Most Connected Improved,Time of Most Connected Improved (ms),"
-			+ "Weigh of Least Connected,Time of Least Connected (ms),"
-			+ "Weigh of Least Connected Improved,Time of Least Connected Improved (ms),"
-			+ "Weigh of Iterated Greedy #" + FinderIteratedGreedy.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy #" + FinderIteratedGreedy.DEFAULT_NUM_TRIES + " (ms),"
-			+ "Weigh of Iterated Greedy Improved #" + FinderIteratedGreedyImproved.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy Improved #" + FinderIteratedGreedyImproved.DEFAULT_NUM_TRIES + " (ms),"
-			
-			+ "Weigh of Iterated Greedy Custom 1 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy Custom 1 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + " (ms),"
-			+ "Weigh of Iterated Greedy Custom 2 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy Custom 2 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + " (ms),"
-			+ "Weigh of Iterated Greedy Custom 3 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy Custom 3 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + " (ms),"
-			+ "Weigh of Iterated Greedy Custom 4 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + ",Time of Iterated Greedy Custom 4 #" + FinderIteratedGreedyCustom.DEFAULT_NUM_TRIES + " (ms)";
+			+ "Weigh C1,Time C1 (ms),"
+			+ "Weigh C2,Time C2 (ms),"
+			+ "Weigh D1,Time D1 (ms),"
+			+ "Weigh D2,Time D2 (ms)";
 	
-	public static void createResultsFile(String filePath) {
+	public static final String IG_FILE_HEADER = ""
+			+ "Graph Name,"
+			+ "Weigh of Original Graph,"
+			+ "Weigh IG1,Time IG1 (ms),"
+			+ "Weigh IG2,Time IG2 (ms),"
+			+ "Weigh IGM1,Time IGM1 (ms),"
+			+ "Weigh IGM2,Time IGM2 (ms)";
+	
+	public static final String IG_PARAMS_FILE_HEADER = ""
+			+ "iterations,"
+			+ "weight1,time1,"
+			+ "weight2,time2,"
+			+ "weight3,time3,"
+			+ "weight4,time4,"
+			+ "weight5,time5,"
+			+ "weight6,time6,"
+			+ "weight7,time7,"
+			+ "weight8,time8,"
+			+ "weight9,time9";
+	
+	public static final String FINAL_IG_FILE_HEADER = ""
+			+ "instance,originalweight,"
+			+ "weightigm2,timeigm2";
+	
+	public static void createResultsFile(String filePath, String fileHeader) {
 		PrintWriter writer;
 		FileWriter fileWriter = null;
 		try {
@@ -38,7 +57,7 @@ public class CSV {
 			
 			// Add header
 			fileWriter = new FileWriter(filePath);
-			fileWriter.append(FILE_HEADER);
+			fileWriter.append(fileHeader);
 			
 			// New line
 			fileWriter.append(NEW_LINE_SEPARATOR);
@@ -59,19 +78,9 @@ public class CSV {
             }
         }
 	}
-	
-	public static void appendResult(String filePath,
-			String name, Float weightOriginal,
-			Float weightMostConnected, Long timeMostConnected,
-			Float weightMostConnectedImproved, Long timeMostConnectedImproved,
-			Float weightLeastConnected, Long timeLeastConnected,
-			Float weightLeastConnectedImproved, Long timeLeastConnectedImproved,
-			Float weightIteratedGreedy, Long timeIteratedGreedy,
-			Float weightIteratedGreedyImproved, Long timeIteratedGreedyImproved,
-			Float weightIteratedGreedyCustomOne, Long timeIteratedGreedyCustomOne,
-			Float weightIteratedGreedyCustomTwo, Long timeIteratedGreedyCustomTwo,
-			Float weightIteratedGreedyCustomThree, Long timeIteratedGreedyCustomThree,
-			Float weightIteratedGreedyCustomFour, Long timeIteratedGreedyCustomFour) {
+
+	public static void appendRowStats(
+			String filePath, String name, Float totalWeight, List<Result> listResult) {
 		
 		FileWriter fileWriter = null;
         try {
@@ -80,72 +89,60 @@ public class CSV {
 			// Graph name identifier
 			fileWriter.append(name);
 			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(weightOriginal.toString());
+			fileWriter.append(totalWeight.toString());
 			fileWriter.append(COMMA_DELIMITER);
 			
-			// Most connected
-			fileWriter.append(weightMostConnected.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeMostConnected.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Most connected Improved
-			fileWriter.append(weightMostConnectedImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeMostConnectedImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-
-			// Least connected
-			fileWriter.append(weightLeastConnected.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeLeastConnected.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Least connected improved
-			fileWriter.append(weightLeastConnectedImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeLeastConnectedImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy
-			fileWriter.append(weightIteratedGreedy.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedy.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy improved
-			fileWriter.append(weightIteratedGreedyImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedyImproved.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy custom 1
-			fileWriter.append(weightIteratedGreedyCustomOne.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedyCustomOne.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy custom 2
-			fileWriter.append(weightIteratedGreedyCustomTwo.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedyCustomTwo.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy custom 3
-			fileWriter.append(weightIteratedGreedyCustomThree.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedyCustomThree.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			
-			// Iterated greedy custom 4
-			fileWriter.append(weightIteratedGreedyCustomFour.toString());
-			fileWriter.append(COMMA_DELIMITER);
-			fileWriter.append(timeIteratedGreedyCustomFour.toString());
+			for (Result aux : listResult) {
+				fileWriter.append(aux.weight.toString());
+				fileWriter.append(COMMA_DELIMITER);
+				fileWriter.append(aux.time.toString());
+				if (listResult.indexOf(aux) < listResult.size() - 1) {
+					fileWriter.append(COMMA_DELIMITER);
+				}
+			}
 			
 			// New line
 			fileWriter.append(NEW_LINE_SEPARATOR);
 			
             System.out.println("Graph appended to CSV file");
+        } catch (IOException ignored) {
+            System.out.println("Error while creating CSV file");
+        } finally {
+            try {
+				if (fileWriter != null) {
+					fileWriter.flush();
+					fileWriter.close();
+				}
+            } catch (IOException ignored) {
+                System.out.println("Error while flushing and closing");
+            }
+        }
+	}
+	
+	public static void appendRowIGStats(
+			String filePath, List<ResultIG> listResult) {
+		
+		FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(filePath, true);
+			
+			// Num of tries
+			fileWriter.append(listResult.get(0).tries.toString());
+			fileWriter.append(COMMA_DELIMITER);
+			
+			for (Result aux : listResult) {
+				fileWriter.append(aux.weight.toString());
+				fileWriter.append(COMMA_DELIMITER);
+				fileWriter.append(aux.time.toString());
+				if (listResult.indexOf(aux) < listResult.size() - 1) {
+					fileWriter.append(COMMA_DELIMITER);
+				}
+			}
+			
+			// New line
+			fileWriter.append(NEW_LINE_SEPARATOR);
+			
+            System.out.println("Line of iterations appended to CSV file");
         } catch (IOException ignored) {
             System.out.println("Error while creating CSV file");
         } finally {

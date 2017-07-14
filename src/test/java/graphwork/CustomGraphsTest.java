@@ -20,7 +20,7 @@ public class CustomGraphsTest {
 		graph.addEdge(3, 4, 5);
 		
 		Finder finder = new FinderConstructive(graph);
-		Graph result = finder.getMinimumCoverTree();
+		Graph result = finder.getMinimumTreeCover();
 		
 		// Validate result
 		assertTrue(result.isTree());
