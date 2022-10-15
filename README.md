@@ -1,8 +1,6 @@
 GraphWork
 =================
 
-[![Travis Build](https://travis-ci.org/alxhotel/graphwork.svg?branch=master)](https://travis-ci.org/alxhotel/graphwork)
-
 GraphWork is a project for URJC.
 
 Warning: there are 3 corrupted graph files, from the "large" set.
