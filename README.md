@@ -1,6 +1,8 @@
 GraphWork
 =================
 
+[![Build Status](https://img.shields.io/github/workflow/status/alxhotel/graphwork/ci/master)](https://github.com/alxhotel/graphwork/actions)
+
 GraphWork is a project for URJC.
 
 Warning: there are 3 corrupted graph files, from the "large" set.
